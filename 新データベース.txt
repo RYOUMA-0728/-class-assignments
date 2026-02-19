@@ -1,0 +1,146 @@
+CREATE DATABASE distribution1;
+\c distribution1;
+
+CREATE TABLE m_customer (
+    customer_id SERIAL PRIMARY KEY,
+    login_id VARCHAR(50) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    phone_number VARCHAR(20),
+    email VARCHAR(100)
+);
+
+CREATE TABLE m_delivery_staff (
+    staff_id SERIAL PRIMARY KEY,
+    login_id VARCHAR(50) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    phone_number VARCHAR(20),
+    branch_id INTEGER
+);
+
+CREATE TABLE m_carrier_user (
+    carrier_user_id SERIAL PRIMARY KEY,
+    login_id VARCHAR(50) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    branch_id INTEGER
+);
+
+CREATE TABLE m_branch_office (
+    branch_id SERIAL PRIMARY KEY,
+    branch_name VARCHAR(100) NOT NULL,
+    address VARCHAR(255) NOT NULL,
+    phone_number VARCHAR(20)
+);
+
+CREATE TABLE t_delivery_request (
+    request_id SERIAL PRIMARY KEY,
+    tracking_number VARCHAR(30) NOT NULL UNIQUE,
+    customer_id INTEGER NOT NULL,
+    request_date DATE NOT NULL,
+    pickup_date DATE,
+    pickup_time_slot VARCHAR(20),
+    status VARCHAR(20) NOT NULL,
+    branch_id INTEGER,
+
+    FOREIGN KEY (customer_id) REFERENCES m_customer(customer_id),
+    FOREIGN KEY (branch_id) REFERENCES m_branch_office(branch_id)
+);
+
+CREATE TABLE t_package_pickup (
+    package_id SERIAL PRIMARY KEY,
+    request_id INTEGER NOT NULL,
+    postal_code VARCHAR(10),
+    address VARCHAR(255) NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    phone_number VARCHAR(20),
+    package_type VARCHAR(50),
+    quantity INTEGER NOT NULL,
+
+    FOREIGN KEY (request_id) REFERENCES t_delivery_request(request_id)
+);
+
+CREATE TABLE t_package_delivery (
+    package_id SERIAL PRIMARY KEY,
+    request_id INTEGER NOT NULL,
+    postal_code VARCHAR(10),
+    address VARCHAR(255) NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    phone_number VARCHAR(20),
+
+    FOREIGN KEY (request_id) REFERENCES t_delivery_request(request_id)
+);
+
+\dt
+
+INSERT INTO m_branch_office (branch_name, address, phone_number) VALUES
+('東京営業所', '東京都千代田区1-1-1', '03-1111-1111'),
+('大阪営業所', '大阪府大阪市北区2-2-2', '06-2222-2222');
+
+INSERT INTO m_customer (login_id, password_hash, name, phone_number, email) VALUES
+('customer01', 'hash_pass_01', '山田 太郎', '090-1234-5678', 'taro@example.com'),
+('customer02', 'hash_pass_02', '佐藤 花子', '080-9876-5432', 'hanako@example.com');
+
+INSERT INTO m_delivery_staff (login_id, password_hash, name, phone_number, branch_id) VALUES
+('staff01', 'hash_staff_01', '鈴木 一郎', '090-1111-2222', 1),
+('staff02', 'hash_staff_02', '田中 次郎', '090-3333-4444', 2);
+
+INSERT INTO m_carrier_user (login_id, password_hash, name, branch_id) VALUES
+('admin_tokyo', 'hash_admin_01', '東京管理者', 1),
+('admin_osaka', 'hash_admin_02', '大阪管理者', 2);
+
+INSERT INTO t_delivery_request
+(tracking_number, customer_id, request_date, pickup_date, pickup_time_slot, status, branch_id)
+VALUES
+('TRK0001', 1, CURRENT_DATE, CURRENT_DATE + 1, 'AM', 'REQUESTED', 1),
+('TRK0002', 2, CURRENT_DATE, CURRENT_DATE + 2, 'PM', 'IN_DELIVERY', 2);
+
+INSERT INTO t_package_pickup
+(request_id, postal_code, address, name, phone_number, package_type, quantity)
+VALUES
+(1, '100-0001', '東京都千代田区1-1-1', '山田 太郎', '090-1234-5678', 'ダンボール', 2),
+(2, '530-0001', '大阪府大阪市北区2-2-2', '佐藤 花子', '080-9876-5432', '封筒', 1);
+
+INSERT INTO t_package_delivery
+(request_id, postal_code, address, name, phone_number)
+VALUES
+(1, '150-0001', '東京都渋谷区3-3-3', '鈴木 一郎', '090-5555-6666'),
+(2, '460-0001', '愛知県名古屋市中区4-4-4', '高橋 三郎', '090-7777-8888');
+
+ALTER TABLE t_delivery_request ADD COLUMN driver_id integer;
+UPDATE t_delivery_request
+SET driver_id = 1
+WHERE request_id = 123;
+
+--ここからコピペ不可
+
+<?php
+echo "Tokyo hash: " . password_hash('admin123', PASSWORD_DEFAULT) . "\n";
+echo "Osaka hash: " . password_hash('osaka456', PASSWORD_DEFAULT) . "\n";
+
+
+-- admin_tokyo のパスワード更新
+UPDATE m_carrier_user
+SET password_hash = '$2y$10$MCEtOEWJNyWneMz99pVNQ.XlXaJLHRZu5BHx2WW7Nd62exkFYLuV2',
+    name = '東京管理者',
+    branch_id = 1
+WHERE login_id = 'admin_tokyo';
+
+-- admin_osaka のパスワード更新
+UPDATE m_carrier_user
+SET password_hash = '$2y$10$kEjn6a6kSwiEyu2N44FBBO7NyBySG1nu0yzCXCjc5UbhoZzyxZTNi',
+    name = '大阪管理者',
+    branch_id = 2
+WHERE login_id = 'admin_osaka';
+
+SELECT
+    r.tracking_number,
+    c.name AS customer_name,
+    r.status,
+    p.address AS pickup_address,
+    d.address AS delivery_address
+FROM t_delivery_request r
+JOIN m_customer c ON r.customer_id = c.customer_id
+JOIN t_package_pickup p ON r.request_id = p.request_id
+JOIN t_package_delivery d ON r.request_id = d.request_id;
