@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <title>営業所 配送最適化ダッシュボード</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #eef2f6;
+        }
+
+        .scroll-area {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex">
+
+<!-- サイドバー -->
+<aside class="w-20 bg-gray-900 text-white flex flex-col items-center p-4">
+    <nav class="flex-grow">
+        <span class="text-xs text-gray-400">営業所</span>
+    </nav>
+    <a href="office_login.html"
+       class="text-red-400 hover:text-red-300 text-sm mt-auto">
+        ログアウト
+    </a>
+</aside>
+
+<!-- メイン -->
+<main class="flex-grow p-8">
+
+<header class="mb-8">
+    <h1 class="text-3xl font-extrabold text-gray-800">
+        営業所 配送最適化ダッシュボード
+    </h1>
+    <p class="text-sm text-gray-600 mt-1">
+        担当者：
+        <span class="font-semibold">山田 太郎</span>
+    </p>
+</header>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+<!-- 配達員一覧 -->
+<div class="lg:col-span-2 bg-white rounded-xl shadow-xl p-6">
+    <h2 class="text-xl font-bold text-indigo-700 mb-4">
+        配達員スケジュール状況
+    </h2>
+
+    <div class="space-y-4 scroll-area pr-2">
+
+        <!-- 配達員カード -->
+        <div class="p-4 border rounded-xl shadow hover:shadow-lg transition">
+            <div class="flex justify-between mb-2">
+                <div>
+                    <p class="text-lg font-bold text-gray-800">田中 太郎</p>
+                    <p class="text-sm text-gray-500">中央区</p>
+                </div>
+                <span class="font-bold text-indigo-700">5 / 15</span>
+            </div>
+
+            <div class="w-full bg-gray-200 rounded-full h-3">
+                <div class="h-3 rounded-full bg-green-500" style="width: 33%"></div>
+            </div>
+        </div>
+
+        <div class="p-4 border rounded-xl shadow hover:shadow-lg transition">
+            <div class="flex justify-between mb-2">
+                <div>
+                    <p class="text-lg font-bold text-gray-800">鈴木 花子</p>
+                    <p class="text-sm text-gray-500">港区</p>
+                </div>
+                <span class="font-bold text-indigo-700">10 / 12</span>
+            </div>
+
+            <div class="w-full bg-gray-200 rounded-full h-3">
+                <div class="h-3 rounded-full bg-red-500" style="width: 83%"></div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- 最適化 -->
+<div class="bg-white rounded-xl shadow-xl p-6">
+    <h2 class="text-xl font-bold text-red-700 mb-4">
+        ルート最適化 & 割り当て
+    </h2>
+
+    <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+        <p class="text-sm text-red-600">未割り当てタスク数</p>
+        <p class="text-4xl font-extrabold text-red-800">
+            6
+        </p>
+    </div>
+
+    <button onclick="alert('最適化処理は次フェーズで実装')"
+        class="w-full py-3 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 transition">
+        最適化を実行
+    </button>
+</div>
+
+</div>
+</main>
+
+</body>
+</html>

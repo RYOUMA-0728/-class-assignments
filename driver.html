@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>配達員ダッシュボード</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="min-h-screen bg-gray-100">
+
+<main class="p-6">
+    <h1 class="text-2xl font-bold mb-4">
+        本日のタスク（<span id="driver-name"></span>様）
+    </h1>
+
+    <div class="mb-4 text-blue-600 font-semibold">
+        完了: <span id="tasks-completed">0</span> /
+        <span id="tasks-total">0</span>
+    </div>
+
+    <div id="task-list" class="space-y-4"></div>
+</main>
+
+<script>
+let tasks = [];
+
+// タスク描画
+function renderTaskList() {
+    const list = document.getElementById('task-list');
+    list.innerHTML = '';
+
+    let completed = 0;
+
+    tasks.forEach(task => {
+        if (task.status === 'completed') completed++;
+
+        const card = document.createElement('div');
+        card.className = 'bg-white p-4 rounded shadow';
+
+        card.innerHTML = `
+            <div class="font-bold">${task.task_type}：${task.tracking_number}</div>
+            <div class="text-sm text-gray-600">${task.address}</div>
+            <div class="text-sm">希望時間：${task.time_slot}</div>
+            <div class="mt-2">
+                状態：
+                <span class="${task.status === 'completed' ? 'text-green-600' : 'text-blue-600'}">
+                    ${task.status === 'completed' ? '完了' : '未完了'}
+                </span>
+            </div>
+        `;
+        list.appendChild(card);
+    });
+
+    document.getElementById('tasks-total').textContent = tasks.length;
+    document.getElementById('tasks-completed').textContent = completed;
+}
+
+// 初期ロード
+fetch('driver_dashboard.php')
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById('driver-name').textContent = data.staff_name;
+        tasks = data.tasks;
+        renderTaskList();
+    })
+    .catch(() => {
+        alert('タスク取得に失敗しました');
+    });
+</script>
+
+</body>
+</html>
