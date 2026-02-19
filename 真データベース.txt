@@ -1,0 +1,165 @@
+顧客ログイン
+ID 名前 カナ 生年月日 パスワード 郵便番号 住所
+
+配達員ログイン
+ID 名前 カナ 生年月日 パスワード 郵便番号 住所
+
+配送業者ログイン
+ID 名前 カナ 生年月日 パスワード 郵便番号 住所
+
+荷物マスター
+マスターID 依頼者データのID お届け先データのID 配送ステータス
+
+依頼者データ
+ID 顧客ログインのID 荷物の種類 個数
+
+お届け先データ
+ID 名前 カナ 生年月日 パスワード 郵便番号 住所
+
+配送ステータス
+ステータス
+
+以下クリエイト文(コピペOK) データベース名(distribution2)
+
+CREATE DATABASE distribution2
+  WITH ENCODING='UTF8'
+  LC_COLLATE='ja_JP.UTF-8'
+  LC_CTYPE='ja_JP.UTF-8'
+  TEMPLATE=template0;
+
+\c distribution2;
+
+CREATE TABLE customers (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    kana VARCHAR(100),
+    birth_date DATE,
+    password VARCHAR(255) NOT NULL,
+    postal_code VARCHAR(10),
+    address VARCHAR(255)
+);
+
+CREATE TABLE delivery (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    kana VARCHAR(100),
+    birth_date DATE,
+    password VARCHAR(255) NOT NULL,
+    postal_code VARCHAR(10),
+    address VARCHAR(255)
+);
+
+CREATE TABLE carriers (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    kana VARCHAR(100),
+    birth_date DATE,
+    password VARCHAR(255) NOT NULL,
+    postal_code VARCHAR(10),
+    address VARCHAR(255)
+);
+
+CREATE TABLE requester_data (
+    id SERIAL PRIMARY KEY,
+    customer_id INT NOT NULL,
+    package_type VARCHAR(100),
+    quantity INT NOT NULL CHECK (quantity > 0),
+
+    CONSTRAINT fk_requester_customer
+        FOREIGN KEY (customer_id)
+        REFERENCES customers(id)
+        ON DELETE CASCADE
+);
+
+CREATE TABLE destination_data (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    kana VARCHAR(100),
+    birth_date DATE,
+    password VARCHAR(255),
+    postal_code VARCHAR(10),
+    address VARCHAR(255)
+);
+
+CREATE TABLE delivery_status (
+    status_id SERIAL PRIMARY KEY,
+    status_name VARCHAR(50) NOT NULL UNIQUE
+);
+
+INSERT INTO delivery_status (status_name) VALUES
+('受付'),
+('集荷中'),
+('配送中'),
+('配達完了');
+
+CREATE TABLE package_master (
+    master_id SERIAL PRIMARY KEY,
+    requester_id INT NOT NULL,
+    destination_id INT NOT NULL,
+    status_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_package_requester
+        FOREIGN KEY (requester_id)
+        REFERENCES requester_data(id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_package_destination
+        FOREIGN KEY (destination_id)
+        REFERENCES destination_data(id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_package_status
+        FOREIGN KEY (status_id)
+        REFERENCES delivery_status(status_id)
+);
+
+INSERT INTO customers
+(name, kana, birth_date, password, postal_code, address)
+VALUES
+('山田 太郎', 'ヤマダ タロウ', '1990-01-15', 'customer123', '1000001', '東京都千代田区千代田1-1'),
+('高橋 花', 'タカハシ ハナ', '1995-07-08', 'customer456', '1700001', '東京都豊島区池袋1-1');
+
+INSERT INTO delivery
+(name, kana, birth_date, password, postal_code, address)
+VALUES
+('佐藤 一郎', 'サトウ イチロウ', '1985-06-20', 'deliverypass', '1500001', '東京都渋谷区神宮前1-1'),
+('鈴木 次郎', 'スズキ ジロウ', '1992-09-12', 'deliverypass2', '1400001', '東京都品川区北品川1-1');
+
+INSERT INTO carriers
+(name, kana, birth_date, password, postal_code, address)
+VALUES
+('日本配送株式会社', 'ニホンハイソウ', '2000-04-01', 'carrierpass', '2200001', '神奈川県横浜市西区みなとみらい1-1');
+
+INSERT INTO requester_data
+(customer_id, package_type, quantity)
+VALUES
+(1, '書類', 1),
+(1, '食品', 2),
+(2, '精密機器', 1);
+
+INSERT INTO destination_data
+(name, kana, birth_date, password, postal_code, address)
+VALUES
+('鈴木 花子', 'スズキ ハナコ', '1992-03-10', NULL, '1600022', '東京都新宿区新宿1-1'),
+('田中 次郎', 'タナカ ジロウ', '1988-11-05', NULL, '5300001', '大阪府大阪市北区梅田1-1'),
+('伊藤 美咲', 'イトウ ミサキ', '1993-05-22', NULL, '4600008', '愛知県名古屋市中区栄1-1');
+
+INSERT INTO package_master
+(requester_id, destination_id, status_id)
+VALUES
+(1, 1, 1), -- 書類 → 受付
+(2, 2, 3), -- 食品 → 配送中
+(3, 3, 2); -- 精密機器 → 集荷中
+
+ALTER TABLE destination_data
+ADD COLUMN delivery_date DATE,
+ADD COLUMN delivery_time VARCHAR(10);
+
+ALTER TABLE package_master
+ADD COLUMN carrier_id INT NULL;
+
+
+SELECT * FROM customers;
+SELECT * FROM delivery;
+SELECT * FROM carriers;
