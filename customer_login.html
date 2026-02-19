@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>顧客ログイン | 配送状況確認システム</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FFEF6C;
+        }
+
+        .login-card {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1),
+                0 0 10px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <div class="login-card w-full max-w-md bg-white rounded-xl p-8 space-y-8">
+
+        <div class="text-center">
+            <h1 class="text-3xl font-bold text-gray-900">ログイン</h1>
+            <p class="mt-2 text-sm text-gray-600">
+                配送状況の確認、集荷依頼
+            </p>
+        </div>
+
+        <!-- ▼ PHPにPOSTするフォーム -->
+        <form action="customer_login.php" method="POST" class="space-y-6">
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">
+                    顧客ID / メールアドレス
+                </label>
+                <input type="text" name="loginId" required
+                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg" placeholder="顧客ID/メールアドレスを入力">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">
+                    パスワード
+                </label>
+                <input type="password" name="password" required
+                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg" placeholder="パスワードを入力">
+            </div>
+
+            <button type="submit" class="w-full py-2 bg-blue-600 text-white rounded-lg">
+                ログイン
+            </button>
+
+        </form>
+
+
+    </div>
+
+</body>
+
+</html>

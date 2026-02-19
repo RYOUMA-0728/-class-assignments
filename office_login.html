@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <title>営業所スタッフ ログイン</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="min-h-screen flex items-center justify-center bg-gray-100">
+
+    <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
+        <h1 class="text-2xl font-bold text-center mb-6">営業所ログイン</h1>
+
+        <form action="office_login.php" method="POST" class="space-y-4">
+
+            <div>
+                <label for="login_id" class="text-sm font-medium">ログインID</label>
+                <input type="text" id="login_id" name="login_id" required class="w-full border rounded-lg px-3 py-2"
+                    placeholder="ログインIDを入力">
+            </div>
+
+            <div>
+                <label for="password" class="text-sm font-medium">パスワード</label>
+                <input type="password" id="password" name="password" required class="w-full border rounded-lg px-3 py-2"
+                    placeholder="パスワードを入力">
+            </div>
+
+            <button type="submit"
+                class="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition">
+                ログイン
+            </button>
+
+        </form>
+    </div>
+
+</body>
+
+</html>
